@@ -1,0 +1,19 @@
+type SduiTemplate {
+    id: ID!
+    name: String!
+    json: String!
+    version: String
+    createdAt: String
+    updatedAt: String
+}
+
+type Query {
+    templates: [SduiTemplate!]!
+    template(id: ID!): SduiTemplate
+}
+
+type Mutation {
+    saveTemplate(name: String!, json: String!): SduiTemplate!
+    updateTemplate(id: ID!, name: String, json: String): SduiTemplate!
+    deleteTemplate(id: ID!): Boolean!
+}
