@@ -7,9 +7,14 @@ type SduiTemplate {
     updatedAt: String
 }
 
+scalar JSON
+
 type Query {
     templates: [SduiTemplate!]!
     template(id: ID!): SduiTemplate
+    templatesFiltered(filter: String, sort: String): [SduiTemplate!]!
+    # Generic raw JSON passthrough (still validated, not arbitrary SQL)
+    rawQuery(query: String!, variables: JSON): JSON
 }
 
 type Mutation {

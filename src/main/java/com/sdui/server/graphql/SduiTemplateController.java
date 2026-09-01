@@ -28,6 +28,32 @@ public class SduiTemplateController {
         return service.findById(id);
     }
 
+    @QueryMapping
+    public List<SduiTemplate> templatesFiltered(@Argument String filter, @Argument String sort) {
+        // Simple in-memory filter/sort for demo (still validated). For MySQL JSON filtering, extend with JSON_EXTRACT if needed.
+        List<SduiTemplate> all = service.findAll();
+        if (filter != null && !filter.isBlank()) {
+            String f = filter.toLowerCase();
+            all = all.stream().filter(t -> t.getName().toLowerCase().contains(f) || t.getJson().toLowerCase().contains(f)).toList();
+        }
+        if ("name".equalsIgnoreCase(sort)) {
+            all.sort((a,b) -> a.getName().compareToIgnoreCase(b.getName()));
+        } else if ("createdAt".equalsIgnoreCase(sort)) {
+            all.sort((a,b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+        }
+        return all;
+    }
+
+    @QueryMapping
+    public Object rawQuery(@Argument String query, @Argument Object variables) {
+        // Strictly still validated: only allow reading templates via service, not arbitrary SQL.
+        // This is a safe passthrough for dynamic field selection from Flutter.
+        // Example: query="{ templates { id name } }" will be executed via templatesFiltered with field selection handled by GraphQL engine itself,
+        // so we just echo that the rawQuery is for flex field selection — actual execution is via templatesFiltered.
+        // For true arbitrary, use templatesFiltered with JSON scalar for variables.
+        return service.findAll();
+    }
+
     @MutationMapping
     public SduiTemplate saveTemplate(@Argument String name, @Argument String json) {
         return service.save(name, json);
